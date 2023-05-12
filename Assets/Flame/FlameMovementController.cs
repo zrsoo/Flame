@@ -17,14 +17,14 @@ public class FlameMovementController : MonoBehaviour
     public GameObject flamePrefab;
 
     private Vector3 lastFlamePosition;
-    private float flameSpawnPositionDifference = 0.01f;
+    private float flameSpawnPositionDifference = 0.001f;
 
     private bool isFirstFrame = true;
 
     // Start is called before the first frame update
     void Start()
     {
-        speed = 0.05f;
+        speed = 0.01f;
 
         PlaceFlameOnTable();
         GenerateRandomMovementDirection();
@@ -65,7 +65,7 @@ public class FlameMovementController : MonoBehaviour
         if(distanceTraveled > flameSpawnPositionDifference && !isFirstFrame)
         {
             GameObject newFlame = Instantiate(flamePrefab, transform.position, transform.rotation);
-            newFlame.AddComponent<ProceduralFlame>();
+            newFlame.AddComponent<FlameNoisyFlickerController>();
             lastFlamePosition = transform.position;
         }
 

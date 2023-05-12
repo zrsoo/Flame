@@ -5,19 +5,11 @@ using UnityEngine;
 public class ProceduralFlame : MonoBehaviour
 {
     private Mesh mesh;
-    private MeshRenderer meshRenderer;
-
-    private float speed = 25.0f;
-    private float timePeriod = 100.0f;
-    private float time = 0.0f;
-
-    private float timeOffset;
 
     void Start()
     {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
-        meshRenderer = GetComponent<MeshRenderer>();
 
         int segments = 16;
 
@@ -77,22 +69,5 @@ public class ProceduralFlame : MonoBehaviour
 
         // Calculate normals
         mesh.RecalculateNormals();
-
-        timeOffset = Random.Range(0.0f, timePeriod);
-    }
-
-    private void Update()
-    {
-        time = ((Time.time + timeOffset) % timePeriod) / timePeriod;
-        time = Mathf.Sin(time * 2 * Mathf.PI) * speed;
-
-        float noisyAmplitude = Mathf.PerlinNoise(time, 0.0f);
-        noisyAmplitude *= 1.3f;
-
-        float noisySpeed = Mathf.PerlinNoise(0.0f, time);
-        noisySpeed *= 0.5f;
-
-        meshRenderer.material.SetFloat("_WaveAmplitude", noisyAmplitude);
-        meshRenderer.material.SetFloat("_WaveSpeed", noisySpeed);
     }
 }
