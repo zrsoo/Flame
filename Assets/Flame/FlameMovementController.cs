@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO solve flame rising problem
 // TODO Adjust flame flicker speed in ordinance with flame movement speed
 
 public class FlameMovementController : MonoBehaviour
@@ -47,24 +48,30 @@ public class FlameMovementController : MonoBehaviour
         if (distanceTraveled > flameSpawnPositionDifference)
         {
             GameObject newFlame = Instantiate(flamePrefab, transform.position, transform.rotation);
+            StartCoroutine(RiseFromTable(newFlame, 0.5f));
             newFlame.AddComponent<FlameNoisyFlickerController>();
+
             lastFlamePosition = transform.position;
         }
     }
 
     private void KeepFlameOnSurface()
     {
+        Debug.DrawRay(transform.position + movementDirection * speed * Time.deltaTime, -Vector3.up * 10, Color.red);
+
         // Cast ray straight down (while looking ahead, in order to change course before going off the table).
-        if (Physics.Raycast(transform.position + movementDirection * (speed + 1.7f) * Time.deltaTime, -Vector3.up, out hitMove))
+        if (Physics.Raycast(transform.position + movementDirection * (speed + 0.1f) * Time.deltaTime, -Vector3.up, out hitMove))
         {
             // If it hits the table.
             if (hitMove.collider.gameObject.tag == "Table")
             {
                 flameOnTable = true;
+                Debug.Log("ON TABLE");
             }
             else
             {
                 flameOnTable = false;
+                Debug.Log("OFF TABLE" + transform.position + ToString());
             }
         }
 
@@ -85,7 +92,7 @@ public class FlameMovementController : MonoBehaviour
             if (hitPlace.collider.gameObject.tag == "Table")
             {
                 // Position flame on table (slightly above).
-                transform.position = hitPlace.point + new Vector3(0, 0.1f, 0);
+                transform.position = hitPlace.point + new Vector3(0, 0.001f, 0);
             }
         }
     }
@@ -102,5 +109,28 @@ public class FlameMovementController : MonoBehaviour
 
         // Apply the random offset to the direction.
         movementDirection = rotation * directionToTableCenter;
+    }
+
+    IEnumerator RiseFromTable(GameObject flame, float duration)
+    {
+        float elapsed = 0.0f;
+        float initialScale = 0.0f;
+        float finalScale = flame.transform.localScale.y;
+
+        Vector3 currentScale = flame.transform.localScale;
+        currentScale.y = initialScale;
+        flame.transform.localScale = currentScale;
+
+        while(elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+
+            t = t * t * (3.0f - 2.0f * t);
+
+            currentScale.y = Mathf.Lerp(initialScale, finalScale, t);
+            flame.transform.localScale = currentScale;
+            yield return null;
+        }
     }
 }

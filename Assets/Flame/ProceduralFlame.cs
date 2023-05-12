@@ -22,7 +22,7 @@ public class ProceduralFlame : MonoBehaviour
         for (int i = 0; i < segments; i++)
         {
             float t = i / (float)(segments - 1);
-            float y = t - 0.5f;
+            float y = t;
 
             float x_offset;
 

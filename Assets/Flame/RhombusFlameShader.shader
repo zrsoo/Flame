@@ -85,11 +85,11 @@ Shader "Unlit/RhombusFlameShader"
                 // fixed4 color = tex2D(_FlameGradient, float2(0.5f, i.uv.y - _Time.y));
 
                 // Calculate the distance from the center of the texture (0.5, 0.5)
-                float distanceFromCenter = distance(i.uv, float2(0.5, 0));
+                float distanceFromCenter = distance(i.uv, float2(0.5, 0.5));
 
                 // Normalize the distance to the range [0, 1]
                 float normalizedDistance = saturate(distanceFromCenter * 2.0);
-                normalizedDistance += 0.2f;
+                normalizedDistance += 0.26f;
 
                 fixed4 colorWhite = fixed4(1, 1, 1, 1);
                 fixed4 colorOrange = fixed4(1, 0.5, 0, 1);

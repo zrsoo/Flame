@@ -32,7 +32,7 @@ public class FlameNoisyFlickerController : MonoBehaviour
         time = Mathf.Sin(time * 2 * Mathf.PI) * speed;
 
         float noisyAmplitude = Mathf.PerlinNoise(time, 0.0f);
-        noisyAmplitude *= 1.3f;
+        noisyAmplitude *= 0.6f;
 
         float noisySpeed = Mathf.PerlinNoise(0.0f, time);
         noisySpeed *= 0.5f;
