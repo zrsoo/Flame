@@ -23,6 +23,11 @@ public class FlameNoisyFlickerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        GenerateNoisyAmplitudeSpeed();
+    }
+
+    private void GenerateNoisyAmplitudeSpeed()
+    {
         time = ((Time.time + timeOffset) % timePeriod) / timePeriod;
         time = Mathf.Sin(time * 2 * Mathf.PI) * speed;
 

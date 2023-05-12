@@ -8,10 +8,13 @@ public class ProceduralFlame : MonoBehaviour
 
     void Start()
     {
+        DrawFlame(64);
+    }
+
+    private void DrawFlame(int segments)
+    {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
-
-        int segments = 16;
 
         // Create the rhombus shape by specifying vertex positions
         Vector3[] vertices = new Vector3[segments * 4];

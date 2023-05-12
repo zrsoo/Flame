@@ -19,8 +19,6 @@ public class FlameMovementController : MonoBehaviour
     private Vector3 lastFlamePosition;
     private float flameSpawnPositionDifference = 0.001f;
 
-    private bool isFirstFrame = true;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -36,12 +34,31 @@ public class FlameMovementController : MonoBehaviour
     void Update()
     {
         transform.Translate(movementDirection * speed * Time.deltaTime, Space.World);
+        KeepFlameOnSurface();
+        ExpandFlame();
+    }
 
+    private void ExpandFlame()
+    {
+        // Instantiate new flames as the flame moves (spread).
+        float distanceTraveled = Vector3.Distance(transform.position, lastFlamePosition);
+
+        // If the flame has traveled enough, spawn another flame.
+        if (distanceTraveled > flameSpawnPositionDifference)
+        {
+            GameObject newFlame = Instantiate(flamePrefab, transform.position, transform.rotation);
+            newFlame.AddComponent<FlameNoisyFlickerController>();
+            lastFlamePosition = transform.position;
+        }
+    }
+
+    private void KeepFlameOnSurface()
+    {
         // Cast ray straight down (while looking ahead, in order to change course before going off the table).
         if (Physics.Raycast(transform.position + movementDirection * (speed + 1.7f) * Time.deltaTime, -Vector3.up, out hitMove))
         {
             // If it hits the table.
-            if(hitMove.collider.gameObject.tag == "Table")
+            if (hitMove.collider.gameObject.tag == "Table")
             {
                 flameOnTable = true;
             }
@@ -52,24 +69,11 @@ public class FlameMovementController : MonoBehaviour
         }
 
         // If the flame is not on the table, pick another random direction.
-        if(!flameOnTable)
+        if (!flameOnTable)
         {
             GenerateRandomMovementDirection();
             flameOnTable = true;
         }
-
-        // Instantiate new flames as the flame moves (spread).
-        float distanceTraveled = Vector3.Distance(transform.position, lastFlamePosition);
-
-        // If the flame has traveled enough, spawn another flame.
-        if(distanceTraveled > flameSpawnPositionDifference && !isFirstFrame)
-        {
-            GameObject newFlame = Instantiate(flamePrefab, transform.position, transform.rotation);
-            newFlame.AddComponent<FlameNoisyFlickerController>();
-            lastFlamePosition = transform.position;
-        }
-
-        isFirstFrame = false;
     }
 
     void PlaceFlameOnTable()
