@@ -103,7 +103,7 @@ Shader "Unlit/RhombusFlameShader"
                     color = lerp(colorOrange, colorRed, (normalizedDistance - 0.7) * 2.0);
                 }
 
-                color.a = lerp(2.5, 0.5, normalizedDistance);
+                color.a = lerp(1.5, 0.5, normalizedDistance);
                 return color;
             }
             ENDCG

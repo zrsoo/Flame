@@ -14,6 +14,13 @@ public class FlameMovementController : MonoBehaviour
     private Vector3 movementDirection;
     public float speed;
 
+    public GameObject flamePrefab;
+
+    private Vector3 lastFlamePosition;
+    private float flameSpawnPositionDifference = 0.01f;
+
+    private bool isFirstFrame = true;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,15 +28,17 @@ public class FlameMovementController : MonoBehaviour
 
         PlaceFlameOnTable();
         GenerateRandomMovementDirection();
+
+        lastFlamePosition = transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
         transform.Translate(movementDirection * speed * Time.deltaTime, Space.World);
-        
+
         // Cast ray straight down (while looking ahead, in order to change course before going off the table).
-        if(Physics.Raycast(transform.position + movementDirection * (speed + 1.7f) * Time.deltaTime, -Vector3.up, out hitMove))
+        if (Physics.Raycast(transform.position + movementDirection * (speed + 1.7f) * Time.deltaTime, -Vector3.up, out hitMove))
         {
             // If it hits the table.
             if(hitMove.collider.gameObject.tag == "Table")
@@ -48,6 +57,19 @@ public class FlameMovementController : MonoBehaviour
             GenerateRandomMovementDirection();
             flameOnTable = true;
         }
+
+        // Instantiate new flames as the flame moves (spread).
+        float distanceTraveled = Vector3.Distance(transform.position, lastFlamePosition);
+
+        // If the flame has traveled enough, spawn another flame.
+        if(distanceTraveled > flameSpawnPositionDifference && !isFirstFrame)
+        {
+            GameObject newFlame = Instantiate(flamePrefab, transform.position, transform.rotation);
+            newFlame.AddComponent<ProceduralFlame>();
+            lastFlamePosition = transform.position;
+        }
+
+        isFirstFrame = false;
     }
 
     void PlaceFlameOnTable()

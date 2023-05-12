@@ -11,6 +11,8 @@ public class ProceduralFlame : MonoBehaviour
     private float timePeriod = 100.0f;
     private float time = 0.0f;
 
+    private float timeOffset;
+
     void Start()
     {
         mesh = new Mesh();
@@ -75,11 +77,13 @@ public class ProceduralFlame : MonoBehaviour
 
         // Calculate normals
         mesh.RecalculateNormals();
+
+        timeOffset = Random.Range(0.0f, timePeriod);
     }
 
     private void Update()
     {
-        time = (Time.time % timePeriod) / timePeriod;
+        time = ((Time.time + timeOffset) % timePeriod) / timePeriod;
         time = Mathf.Sin(time * 2 * Mathf.PI) * speed;
 
         float noisyAmplitude = Mathf.PerlinNoise(time, 0.0f);
