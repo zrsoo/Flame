@@ -18,7 +18,7 @@ public class FlameMovementController : MonoBehaviour
     public GameObject flamePrefab;
 
     private Vector3 lastFlamePosition;
-    private float flameSpawnPositionDifference = 0.001f;
+    private float flameSpawnPositionDifference = 0.01f;
 
     // Start is called before the first frame update
     void Start()
@@ -47,7 +47,7 @@ public class FlameMovementController : MonoBehaviour
         // If the flame has traveled enough, spawn another flame.
         if (distanceTraveled > flameSpawnPositionDifference)
         {
-            GameObject newFlame = Instantiate(flamePrefab, transform.position, transform.rotation);
+            GameObject newFlame = Instantiate(flamePrefab, transform.position - new Vector3(0.0f, 0.0f, 0.01f), transform.rotation);
             StartCoroutine(RiseFromTable(newFlame, 0.5f));
             newFlame.AddComponent<FlameNoisyFlickerController>();
 
@@ -66,12 +66,10 @@ public class FlameMovementController : MonoBehaviour
             if (hitMove.collider.gameObject.tag == "Table")
             {
                 flameOnTable = true;
-                Debug.Log("ON TABLE");
             }
             else
             {
                 flameOnTable = false;
-                Debug.Log("OFF TABLE" + transform.position + ToString());
             }
         }
 
@@ -121,15 +119,38 @@ public class FlameMovementController : MonoBehaviour
         currentScale.y = initialScale;
         flame.transform.localScale = currentScale;
 
+        Material flameMaterial = flame.GetComponent<Renderer>().material;
+        float initialOpacity = 0.0f;
+        float finalOpacity = 1.0f;
+
         while(elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
+            float tScale = Mathf.Clamp01(elapsed / duration);
 
-            t = t * t * (3.0f - 2.0f * t);
+            tScale = tScale * tScale * (3.0f - 2.0f * tScale);
 
-            currentScale.y = Mathf.Lerp(initialScale, finalScale, t);
+            currentScale.y = Mathf.Lerp(initialScale, finalScale, tScale);
             flame.transform.localScale = currentScale;
+
+            float tOpacity;
+            float percentage = elapsed / duration;
+
+            if(percentage > 0.5f)
+            {
+                // Account for jumping over 30%.
+                tOpacity = (percentage - 0.5f) / 0.5f;
+
+                tOpacity = tOpacity * tOpacity * (3.0f - 2.0f * tOpacity);
+
+                float opacity = Mathf.Lerp(initialOpacity, finalOpacity, tOpacity);
+                flameMaterial.SetFloat("_FlameOpacity", opacity);
+            }
+            else
+            {
+                flameMaterial.SetFloat("_FlameOpacity", 0.0f);
+            }
+
             yield return null;
         }
     }

@@ -6,8 +6,9 @@ Shader "Unlit/RhombusFlameShader"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _FlameGradient ("Flame Gradient", 2D) = "white" {}
-        _WaveAmplitude ("Wave Amplitude", Range(0, 0.15)) = 0.1
-        _WaveSpeed ("Wave Speed", Range(0, 0.2)) = 0.1
+        _FlameOpacity ("Flame Opacity", Range(0.0, 1.0)) = 1.0
+        _WaveAmplitude ("Wave Amplitude", Range(0.0, 0.15)) = 0.1
+        _WaveSpeed ("Wave Speed", Range(0.0, 0.2)) = 0.1
     }
     SubShader
     {
@@ -16,6 +17,7 @@ Shader "Unlit/RhombusFlameShader"
 
         Pass
         {
+            ZWrite Off 
             Blend SrcAlpha OneMinusSrcAlpha
             CGPROGRAM
             #pragma vertex vert
@@ -42,10 +44,8 @@ Shader "Unlit/RhombusFlameShader"
             float _WaveAmplitude;
             float _WaveSpeed;
 
-            // TODO color flame
-            // TODO get plank
-            // TODO make flame burn on plank and move
-
+            float _FlameOpacity;
+            
             v2f vert (appdata v)
             {
                 v2f o;
@@ -75,15 +75,6 @@ Shader "Unlit/RhombusFlameShader"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                // Sample texture using vertical uv coord.
-                // fixed4 color = tex2D(_FlameGradient, float2(0.5f, i.uv.y * 2 + 0.3));
-                // float alpha = 1.0 - i.uv.y; // Set the transparency based on the vertical UV coordinate
-
-                // color.rgb *= alpha;
-
-                // float offsetY = i.uv.y - _Time.y * 20.0f;
-                // fixed4 color = tex2D(_FlameGradient, float2(0.5f, i.uv.y - _Time.y));
-
                 // Calculate the distance from the center of the texture (0.5, 0.5)
                 float distanceFromCenter = distance(i.uv, float2(0.5, 0.5));
 
@@ -103,7 +94,9 @@ Shader "Unlit/RhombusFlameShader"
                     color = lerp(colorOrange, colorRed, (normalizedDistance - 0.7) * 2.0);
                 }
 
-                color.a = lerp(1.5, 0.5, normalizedDistance);
+                color.a = lerp(1.0, 0.5, normalizedDistance);
+                color.a *= _FlameOpacity;
+
                 return color;
             }
             ENDCG
