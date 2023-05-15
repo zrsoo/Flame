@@ -138,7 +138,7 @@ public class FlameMovementController : MonoBehaviour
 
             if(percentage > 0.5f)
             {
-                // Account for jumping over 30%.
+                // Account for jumping over 50%.
                 tOpacity = (percentage - 0.5f) / 0.5f;
 
                 tOpacity = tOpacity * tOpacity * (3.0f - 2.0f * tOpacity);
