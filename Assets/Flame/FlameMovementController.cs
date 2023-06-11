@@ -18,7 +18,7 @@ public class FlameMovementController : MonoBehaviour
     public GameObject flamePrefab;
 
     private Vector3 lastFlamePosition;
-    private float flameSpawnPositionDifference = 0.01f;
+    private float flameSpawnPositionDifference = 0.02f;
 
     // Start is called before the first frame update
     void Start()
